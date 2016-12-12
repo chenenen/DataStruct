@@ -34,13 +34,6 @@ public:
 			pRet = pRet->_pNext;
 		}
 	}
-	/*Queue<T>& operator=(const Queue<T>&q)
-	{
-		if(this != &q)
-		{
-			if()
-		}
-	}*/
 	~Queue()
 	{
 		Node* pCur = pHead;
