@@ -1,7 +1,7 @@
 #include<iostream>
 #include<assert.h>
-using namespace std;
 #include"TypeTraites.h"
+using namespace std;
 template<typename T>
 class Vector
 {
@@ -33,19 +33,73 @@ public:
 		_finish = _start+v.Size();
 		_endofStorage = _start+v.Size();
 	}
-	//赋值运算符重载
+	//赋值运算符重载(简洁版)
 	Vector& operator=(Vector<T> v)
 	{
-		std::swap(*this,v.*this);
+		std::swap(_start,v._start);
+		std::swap(_finish,v._finish);
+		std::swap(_endofStorage,v._endofStorage);
 		return *this;
+	}
+	/*//赋值运算符重载（普通版）
+	Vector& operator=(const Vector<T>& v)
+	{
+		//不建议采取这种，容易崩，举个例子如果先释放了2个，申请了10000个，程序就崩了
+		if(this != &v)
+		{
+			Destory();
+			_start = new T[v.Size()];
+			_finish = _start+v.Size();
+			_endofStorage = _start+v.Size();
+				if(TypeTraits<T>::IsPODType().Get())
+			{
+				memcpy(_start,v._start,sizeof(T)*v.Size());
+			}
+			else
+			{
+					for(size_t i = 0; i<v.Size(); i++)
+				{
+					_start[i] = v._start[i];
+				}
+			}
+		}
+		return *this;
+		//第二种方法：建议采取
+		if(this != &v)
+		{
+			size_t size = Size();
+			T* temp = new T[v.Size()];
+			Destory();
+				if(TypeTraits<T>::IsPODType().Get())
+			{
+				memcpy(temp,v._start,sizeof(T)*v.Size());
+			}
+			else
+			{
+					for(size_t i = 0; i<v.Size(); i++)
+				{
+					temp[i] = v._start[i];
+				}
+			}
+			delete[]_start;
+			_start = temp;
+			_finish = _start+size;
+			_endofStorage = _start+size;
+		}
+	}*/
+	//销毁顺序表
+	void Destory()
+	{
+		if(_start)
+		{
+			delete[] _start;
+		}
+		_start = _finish = _endofStorage = NULL;
 	}
 	//析构函数
 	~Vector()
 	{
-		delete[] _start;
-		_start = NULL;
-		_finish = NULL;
-		_endofStorage = NULL;
+		Destory();
 	}
 	//求顺序表的大小
 	size_t Size()
@@ -216,14 +270,7 @@ private:
 	T* _finish;
 	T* _endofStorage;
 };
-//定义一个日期类
-class Date
-{
-private:
-	int _year;
-	int _month;
-	int _day;
-};
+
 /*********************测试函数*******************/
 //测试尾插
 void Test()
@@ -308,6 +355,13 @@ void Test5()
 	v1.PushBack(4);
 	v1.Resize(8,7);
 	cout<<v1.Size()<<endl;
-	
-
 }
+//测试基本的函数：拷贝构造函数，赋值
+void Test6()
+{
+	Vector<int> v1;
+	Vector<int> v2(v1);
+	Vector<int> v3;
+	v3 = v1;
+}
+
